@@ -5,6 +5,7 @@ import { sysctlbyname } from 'download0/kernel'
 import { lapse } from 'download0/lapse'
 import { binloader_init } from 'download0/binloader'
 import { checkJailbroken } from 'download0/check-jailbroken'
+import { safeIncludeMainMenu } from 'download0/include-main-menu'
 
 // Load binloader first (just defines the function, doesn't execute)
 
@@ -19,6 +20,7 @@ include('lapse.js')
 include('kernel.js')
 include('check-jailbroken.js')
 include('stats-tracker.js')
+include('include-main-menu.js')
 log('All scripts loaded')
 
 // Increment total attempts
@@ -169,7 +171,7 @@ if (!is_jailbroken) {
   }
 } else {
   utils.notify('Already Jailbroken!')
-  include('main-menu.js')
+  safeIncludeMainMenu('loader')
 }
 
 export function run_binloader () {

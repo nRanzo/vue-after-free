@@ -1,5 +1,6 @@
 import { libc_addr } from 'download0/userland'
 import { fn, BigInt, mem } from 'download0/types'
+import { safeIncludeMainMenu } from 'download0/include-main-menu'
 
 (function () {
   log('=== Local Video Server ===')
@@ -369,7 +370,15 @@ import { fn, BigInt, mem } from 'download0/types'
         // Wait
       }
 
-      include('main-menu.js')
+      try {
+        include('include-main-menu.js')
+      } catch (e) {
+        log('Failed to include include-main-menu.js: ' + (e as Error).message)
+      }
+
+      if (!safeIncludeMainMenu('payload:explode')) {
+        log('Fallback main menu not available; stay on cleanup screen')
+      }
     }
   }
 

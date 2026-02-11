@@ -3,6 +3,7 @@ import { binloader_init } from 'download0/binloader'
 import { libc_addr } from 'download0/userland'
 import { lang, useImageText, textImageBase } from 'download0/languages'
 import { checkJailbroken } from 'download0/check-jailbroken'
+import { safeIncludeMainMenu } from 'download0/include-main-menu'
 
 (function () {
   if (typeof libc_addr === 'undefined') {
@@ -15,6 +16,7 @@ import { checkJailbroken } from 'download0/check-jailbroken'
 
   log('Loading check-jailbroken.js...')
   include('check-jailbroken.js')
+  include('include-main-menu.js')
 
   if (typeof CONFIG !== 'undefined' && CONFIG.music) {
     const audio = new jsmaf.AudioClip()
@@ -414,26 +416,14 @@ import { checkJailbroken } from 'download0/check-jailbroken'
       handleButtonPress()
     } else if (keyCode === 13) {
       log('Going back to main menu...')
-      try {
-        include('main-menu.js')
-      } catch (e) {
-        const err = e as Error
-        log('ERROR loading main-menu.js: ' + err.message)
-        if (err.stack) log(err.stack)
-      }
+      safeIncludeMainMenu('payload_host:onKeyDown')
     }
   }
 
   function handleButtonPress () {
     if (currentButton === buttons.length - 1) {
       log('Going back to main menu...')
-      try {
-        include('main-menu.js')
-      } catch (e) {
-        const err = e as Error
-        log('ERROR loading main-menu.js: ' + err.message)
-        if (err.stack) log(err.stack)
-      }
+      safeIncludeMainMenu('payload_host:buttonPress')
     } else if (currentButton < fileList.length) {
       const selectedEntry = fileList[currentButton]
       if (!selectedEntry) {
