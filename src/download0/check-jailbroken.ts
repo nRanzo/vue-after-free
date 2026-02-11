@@ -1,6 +1,13 @@
 import { fn, BigInt } from 'download0/types'
 
-export function checkJailbroken (): boolean {
+let cachedJailbreakStatus: boolean | null = null
+
+// Run the jailbreak check once and reuse the result to avoid repeated setuid/getuid syscalls.
+export function checkJailbroken (forceRefresh: boolean = false): boolean {
+  if (!forceRefresh && cachedJailbreakStatus !== null) {
+    return cachedJailbreakStatus
+  }
+
   fn.register(24, 'getuid', [], 'bigint')
   fn.register(23, 'setuid', ['number'], 'bigint')
 
@@ -22,7 +29,11 @@ export function checkJailbroken (): boolean {
   const uidAfterVal = uidAfter instanceof BigInt ? uidAfter.lo : uidAfter
   log('UID after setuid: ' + uidAfterVal)
 
-  const jailbroken = uidAfterVal === 0
-  log(jailbroken ? 'Already jailbroken' : 'Not jailbroken')
-  return jailbroken
+  cachedJailbreakStatus = uidAfterVal === 0
+  log(cachedJailbreakStatus ? 'Already jailbroken' : 'Not jailbroken')
+  return cachedJailbreakStatus
+}
+
+export function getCachedJailbreakStatus (): boolean | null {
+  return cachedJailbreakStatus
 }
